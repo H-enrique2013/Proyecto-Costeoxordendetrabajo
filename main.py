@@ -1,15 +1,23 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import config
 from flask_mysqldb import MySQL
+
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = config.HEX_SEC_KEY
-app.config['MYSQL_HOST'] = config.MYSQL_HOST
-app.config['MYSQL_USER'] = config.MYSQL_USER
-app.config['MYSQL_PASSWORD'] = config.MYSQL_PASSWORD
-app.config['MYSQL_DB'] = config.MYSQL_DB
+# Cargar variables de entorno
+load_dotenv()
+
+app = Flask(__name__)
+
+app.config['SECRET_KEY'] = os.getenv('HEX_SEC_KEY')
+app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 mysql = MySQL(app)
 
@@ -22,7 +30,6 @@ def home():
 def login():
     email = request.form['email']
     password = request.form['password']
-
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
     user = cur.fetchone()
