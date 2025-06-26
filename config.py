@@ -1,0 +1,5 @@
+MYSQL_HOST = 'sql10.freesqldatabase.com'
+MYSQL_USER = 'sql10787003'
+MYSQL_PASSWORD = 'sYqngCs7TT'
+MYSQL_DB = 'sql10787003'
+HEX_SEC_KEY= 'd5fb8c4fa8bd46638dadc4e751e0d68d'
