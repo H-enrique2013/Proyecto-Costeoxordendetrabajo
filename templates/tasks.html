@@ -1,109 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasks</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <title>Mis Órdenes de Trabajo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .action-btn {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .card-task {
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border: none;
+        }
+
+        .card-task .card-header {
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+
+        .navbar-brand {
+            font-size: 1.3rem;
+        }
+    </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bolder" href="#">MIS TAREAS</a>
-            <span>Bienvenido/a {{session['name']}} {{session['surnames']}}<a href="{{url_for('logout')}}" class="mx-3">Salir</a></span>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-3">
+        <div class="container">
+            <a class="navbar-brand" href="#">MIS ÓRDENES DE TRABAJO</a>
+            <div class="ms-auto text-white">
+                Bienvenido/a {{session['name']}} {{session['surnames']}} |
+                <a href="{{url_for('logout')}}" class="text-white text-decoration-underline ms-2">Salir</a>
+            </div>
         </div>
     </nav>
 
-
-    <div class="container">
-        <div class="card mt-3 w-25 mx-auto d-block">
-            <div class="card-body d-flex">
-                <img src="{{url_for('static', filename='images/plus-circle-solid.svg')}}" width="25" class="mx-auto d-block" data-bs-toggle="modal" data-bs-target="#task-modal">
-                <img src="{{url_for('static', filename='images/user-plus-solid.svg')}}" width="25" class="mx-auto d-block" data-bs-toggle="modal" data-bs-target="#user-modal">
-            </div>
+    <!-- Iconos de acción -->
+    <div class="container my-4 text-center">
+        <div class="d-inline-block me-3">
+            <img src="{{url_for('static', filename='images/plus-circle-solid.svg')}}" width="30" class="action-btn" data-bs-toggle="modal" data-bs-target="#task-modal" title="Nueva Tarea">
         </div>
+        <div class="d-inline-block">
+            <img src="{{url_for('static', filename='images/user-plus-solid.svg')}}" width="30" class="action-btn" data-bs-toggle="modal" data-bs-target="#user-modal" title="Nuevo Usuario">
+        </div>
+    </div>
 
-        <!-- Tasks -->
-        <div class="row row-col-1 row-cols-sm-1 row-cols-md-3 row-cols-lg-4 mt-3">
+    <!-- Lista de Tareas -->
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
             {% for task in tasks %}
-
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-header">
-                            {{task.title}}
-                        </div>
-                        <div class="card-body">
-                            {{task.description}}
-                        </div>
-                        <div class="card-footer d-flex justify-content-between">
-                            {{task.date_task}}
-                            <form action="/delete-task" method="POST">
-                                <input type="hidden" value="{{task.id}}" name="id">
-                                <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
-                            </form>
-                        </div>
+            <div class="col">
+                <div class="card card-task h-100">
+                    <div class="card-header">
+                        {{task.title}}
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{task.description}}</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <small class="text-muted">{{task.date_task}}</small>
+                        <form action="/delete-task" method="POST" class="mb-0">
+                            <input type="hidden" name="id" value="{{task.id}}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                        </form>
                     </div>
                 </div>
-
+            </div>
             {% endfor %}
         </div>
-
     </div>
 
-
-    <!-- Task Modal -->
-    <div class="modal fade" id="task-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- MODAL: Nueva Tarea -->
+    <div class="modal fade" id="task-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Nueva tarea</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content">
+                <form action="/new-task" method="post">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Nueva Tarea</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-control mb-3" name="title" required>
+
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control mb-3" name="description" rows="4" required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success w-100">Guardar</button>
+                    </div>
+                </form>
             </div>
-            <div class="modal-body">
-             <form action="/new-task" method="post">
-                <label>Título</label>
-                <input type="text" class="form-control mb-3" name="title">
-                <label>Descripción</label>
-                <textarea class="form-control mb-3" rows="5" name="description"></textarea>
-                <button type="submit" class="btn btn-primary w-100">Guardar</button>
-             </form>
-            </div>
-        </div>
         </div>
     </div>
 
-    <!-- User Modal -->
-    <div class="modal fade" id="user-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- MODAL: Nuevo Usuario -->
+    <div class="modal fade" id="user-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Nuevo usuario</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-             <form action="/new-user" method="post">
-                <div class="row">
-                    <div class="col-6">
-                        <label>Nombre</label>
-                        <input type="text" class="form-control mb-3" name="name">
+            <div class="modal-content">
+                <form action="/new-user" method="post">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Nuevo Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
-                    <div class="col-6">
-                        <label>Apellidos</label>
-                        <input type="text" class="form-control mb-3" name="surnames">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control mb-3" name="name" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Apellidos</label>
+                                <input type="text" class="form-control mb-3" name="surnames" required>
+                            </div>
+                        </div>
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control mb-3" name="email" required>
+
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-control mb-3" name="password" required>
                     </div>
-                </div>
-                <label>Email</label>
-                <input type="email" class="form-control mb-3" name="email">
-                <label>Contraseña</label>
-                <input type="password" class="form-control mb-3" name="password">
-                <button type="submit" class="btn btn-primary w-100">Guardar</button>
-             </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success w-100">Guardar</button>
+                    </div>
+                </form>
             </div>
-        </div>
         </div>
     </div>
-    
+
 </body>
 </html>

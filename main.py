@@ -1,16 +1,20 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mysqldb import MySQL
 from datetime import datetime
-import config  # Este archivo debe existir (leerá variables desde el entorno)
+from dotenv import load_dotenv
+load_dotenv()  # Carga variables desde .env
+
+
+import os  # Usar para acceder a variables de entorno
 
 app = Flask(__name__)
-# Configuración desde config.py (ya hace os.getenv internamente)
-app.config['SECRET_KEY'] = config.HEX_SEC_KEY
-app.config['MYSQL_HOST'] = config.MYSQL_HOST
-app.config['MYSQL_USER'] = config.MYSQL_USER
-app.config['MYSQL_PASSWORD'] = config.MYSQL_PASSWORD
-app.config['MYSQL_DB'] = config.MYSQL_DB
 
+# Configuración directamente desde variables de entorno
+app.config['SECRET_KEY'] = os.environ.get('HEX_SEC_KEY')  # o usa 'SECRET_KEY' si ese es el nombre
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')
 mysql = MySQL(app)
 
 @app.route('/', methods=['GET'])
