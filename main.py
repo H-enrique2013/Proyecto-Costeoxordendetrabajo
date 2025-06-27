@@ -4,7 +4,6 @@ from datetime import datetime
 import config  # Este archivo debe existir (leerá variables desde el entorno)
 
 app = Flask(__name__)
-
 # Configuración desde config.py (ya hace os.getenv internamente)
 app.config['SECRET_KEY'] = config.HEX_SEC_KEY
 app.config['MYSQL_HOST'] = config.MYSQL_HOST
