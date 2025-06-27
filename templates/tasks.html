@@ -1,142 +1,188 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Órdenes de Trabajo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        .action-btn {
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mis Órdenes de Trabajo</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/a2e8d0339f.js" crossorigin="anonymous"></script>
+        <style>
+            .action-btn {
             cursor: pointer;
             transition: transform 0.2s ease;
-        }
-
-        .action-btn:hover {
+            }
+            .action-btn:hover {
             transform: scale(1.1);
-        }
-
-        .card-task {
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            }
+            .card-task {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             border: none;
-        }
-
-        .card-task .card-header {
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+            }
+            .card-task:hover {
+            transform: scale(1.01);
+            }
+            .card-header {
             font-weight: bold;
             background-color: #f8f9fa;
-        }
+            }
+        </style>
+    </head>
+    <body class="bg-light">
 
-        .navbar-brand {
-            font-size: 1.3rem;
-        }
-    </style>
-</head>
-<body class="bg-light">
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-3">
         <div class="container">
             <a class="navbar-brand" href="#">MIS ÓRDENES DE TRABAJO</a>
             <div class="ms-auto text-white">
-                Bienvenido/a {{session['name']}} {{session['surnames']}} |
-                <a href="{{url_for('logout')}}" class="text-white text-decoration-underline ms-2">Salir</a>
+            Bienvenido/a {{session['name']}} {{session['surnames']}} |
+            <a href="{{url_for('logout')}}" class="text-white text-decoration-underline ms-2">Salir</a>
             </div>
         </div>
-    </nav>
+        </nav>
 
-    <!-- Iconos de acción -->
-    <div class="container my-4 text-center">
-        <div class="d-inline-block me-3">
-            <img src="{{url_for('static', filename='images/plus-circle-solid.svg')}}" width="30" class="action-btn" data-bs-toggle="modal" data-bs-target="#task-modal" title="Nueva Tarea">
-        </div>
-        <div class="d-inline-block">
-            <img src="{{url_for('static', filename='images/user-plus-solid.svg')}}" width="30" class="action-btn" data-bs-toggle="modal" data-bs-target="#user-modal" title="Nuevo Usuario">
-        </div>
-    </div>
-
-    <!-- Lista de Tareas -->
-    <div class="container">
-        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-            {% for task in tasks %}
-            <div class="col">
-                <div class="card card-task h-100">
-                    <div class="card-header">
-                        {{task.title}}
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">{{task.description}}</p>
-                    </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center">
-                        <small class="text-muted">{{task.date_task}}</small>
-                        <form action="/delete-task" method="POST" class="mb-0">
-                            <input type="hidden" name="id" value="{{task.id}}">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
-                        </form>
-                    </div>
+        <div class="container my-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+                <div class="d-flex gap-4">
+                <button class="btn btn-outline-primary action-btn" data-bs-toggle="modal" data-bs-target="#task-modal" title="Nueva Tarea">
+                    <i class="fas fa-plus-circle"></i> Nueva Tarea
+                </button>
+                <button class="btn btn-outline-secondary action-btn" data-bs-toggle="modal" data-bs-target="#user-modal" title="Nuevo Usuario">
+                    <i class="fas fa-user-plus"></i> Nuevo Usuario
+                </button>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
+            <div>
+                <h2 class="mb-3 mb-md-0">Lista de Tareas</h2>
+            </div>
 
-    <!-- MODAL: Nueva Tarea -->
-    <div class="modal fade" id="task-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/new-task" method="post">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Nueva Tarea</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for task in tasks %}
+                <div class="col">
+                <div class="card card-task h-100">
+                    <div class="card-header">{{ task.title }}</div>
+                    <div class="card-body">
+                    <p class="card-text">{{ task.description }}</p>
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item"><strong>Personal:</strong> S/ {{ task.gastos_personal_directores or '0.00' }}</li>
+                        <li class="list-group-item"><strong>Asesoría:</strong> S/ {{ task.asesoria_consultoria or '0.00' }}</li>
+                        <li class="list-group-item"><strong>Servicios básicos:</strong> S/ {{ task.servicios_basicos or '0.00' }}</li>
+                        <li class="list-group-item"><strong>Alquileres y reparaciones:</strong> S/ {{ task.alquileres_mantenimiento_reparaciones or '0.00' }}</li>
+                        <li class="list-group-item"><strong>Publicidad y RRPP:</strong> S/ {{ task.publicidad_relaciones_publicas or '0.00' }}</li>
+                        <li class="list-group-item"><strong>Suministros:</strong> S/ {{ task.suministros or '0.00' }}</li>
+                        <li class="list-group-item"><strong>Varios:</strong> S/ {{ task.varios or '0.00' }}</li>
+                    </ul>
+                    <div class="mt-3 fw-bold text-end text-primary">Total: S/ {{ task.total_recursos_indirectos or '0.00' }}</div>
                     </div>
-                    <div class="modal-body">
-                        <label class="form-label">Título</label>
-                        <input type="text" class="form-control mb-3" name="title" required>
-
-                        <label class="form-label">Descripción</label>
-                        <textarea class="form-control mb-3" name="description" rows="4" required></textarea>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                    <small class="text-muted">{{ task.date_task }}</small>
+                    <form action="/delete-task" method="POST" class="mb-0">
+                        <input type="hidden" name="id" value="{{ task.Id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                    </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success w-100">Guardar</button>
-                    </div>
-                </form>
+                </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
-    </div>
 
-    <!-- MODAL: Nuevo Usuario -->
-    <div class="modal fade" id="user-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+        <!-- MODAL: Nueva Tarea -->
+        <div class="modal fade" id="task-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="/new-user" method="post">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Nuevo Usuario</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <form action="/new-task" method="post">
+                <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Nuevo Recurso Indirecto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="title" id="titulo" required>
+                    <label for="titulo">Título</label>
+                </div>
+                <div class="form-floating mb-4">
+                    <textarea class="form-control" name="description" id="descripcion" rows="3" required></textarea>
+                    <label for="descripcion">Descripción</label>
+                </div>
+                <div class="row">
+                    {% set fields = [
+                    ('gastos_personal_directores', 'Gastos de personal y directores'),
+                    ('asesoria_consultoria', 'Asesoría y consultoría'),
+                    ('servicios_basicos', 'Servicios básicos'),
+                    ('alquileres_mantenimiento_reparaciones', 'Alquileres, mantenimiento y reparaciones'),
+                    ('publicidad_relaciones_publicas', 'Publicidad y RRPP'),
+                    ('suministros', 'Suministros'),
+                    ('varios', 'Varios')
+                    ] %}
+                    {% for field, label in fields %}
+                    <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ label }}</label>
+                    <input type="number" step="0.01" class="form-control recurso-input" name="{{ field }}">
                     </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-6">
-                                <label class="form-label">Nombre</label>
-                                <input type="text" class="form-control mb-3" name="name" required>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Apellidos</label>
-                                <input type="text" class="form-control mb-3" name="surnames" required>
-                            </div>
-                        </div>
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control mb-3" name="email" required>
-
-                        <label class="form-label">Contraseña</label>
-                        <input type="password" class="form-control mb-3" name="password" required>
+                    {% endfor %}
+                    <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Total de recursos indirectos</label>
+                    <input type="number" step="0.01" class="form-control bg-light" name="total_recursos_indirectos" id="total-recursos" readonly>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success w-100">Guardar</button>
-                    </div>
-                </form>
+                </div>
+                </div>
+                <div class="modal-footer">
+                <button type="submit" class="btn btn-success w-100">Guardar</button>
+                </div>
+            </form>
             </div>
         </div>
-    </div>
+        </div>
 
-</body>
+        <!-- MODAL: Nuevo Usuario -->
+        <div class="modal fade" id="user-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <form action="/new-user" method="post">
+                <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Nuevo Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                <div class="row">
+                    <div class="col-6">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-control mb-3" name="name" required>
+                    </div>
+                    <div class="col-6">
+                    <label class="form-label">Apellidos</label>
+                    <input type="text" class="form-control mb-3" name="surnames" required>
+                    </div>
+                </div>
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control mb-3" name="email" required>
+
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-control mb-3" name="password" required>
+                </div>
+                <div class="modal-footer">
+                <button type="submit" class="btn btn-success w-100">Guardar</button>
+                </div>
+            </form>
+            </div>
+        </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function calcularTotalRecursos() {
+                let total = 0;
+                document.querySelectorAll('.recurso-input').forEach(input => {
+                total += parseFloat(input.value) || 0;
+                });
+                document.getElementById('total-recursos').value = total.toFixed(2);
+            }
+            document.addEventListener('input', (e) => {
+                if (e.target.classList.contains('recurso-input')) {
+                calcularTotalRecursos();
+                }
+            });
+        </script>
+    </body>
 </html>

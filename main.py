@@ -69,14 +69,38 @@ def newTask():
     email = session.get('email')
     dateTask = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    # Recursos indirectos
+    gastos = float(request.form.get('gastos_personal_directores', 0) or 0)
+    asesoria = float(request.form.get('asesoria_consultoria', 0) or 0)
+    servicios = float(request.form.get('servicios_basicos', 0) or 0)
+    alquileres = float(request.form.get('alquileres_mantenimiento_reparaciones', 0) or 0)
+    publicidad = float(request.form.get('publicidad_relaciones_publicas', 0) or 0)
+    suministros = float(request.form.get('suministros', 0) or 0)
+    varios = float(request.form.get('varios', 0) or 0)
+
+    total = gastos + asesoria + servicios + alquileres + publicidad + suministros + varios
+
     if title and description and email:
         cur = mysql.connection.cursor()
-        sql = "INSERT INTO tasks (email, title, description, date_task) VALUES (%s, %s, %s, %s)"
-        cur.execute(sql, (email, title, description, dateTask))
+        sql = """
+            INSERT INTO tasks (
+                email, title, description, date_task,
+                gastos_personal_directores, asesoria_consultoria, servicios_basicos,
+                alquileres_mantenimiento_reparaciones, publicidad_relaciones_publicas,
+                suministros, varios, total_recursos_indirectos
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cur.execute(sql, (
+            email, title, description, dateTask,
+            gastos, asesoria, servicios, alquileres,
+            publicidad, suministros, varios, total
+        ))
         mysql.connection.commit()
         cur.close()
 
     return redirect(url_for('tasks'))
+
 
 
 @app.route('/new-user', methods=['POST'])
@@ -100,7 +124,7 @@ def newUser():
 def deleteTask():
     id = request.form['id']
     cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM tasks WHERE id = %s", (id,))
+    cur.execute("DELETE FROM tasks WHERE Id = %s", (id,))
     mysql.connection.commit()
     cur.close()
     return redirect(url_for('tasks'))
